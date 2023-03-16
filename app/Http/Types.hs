@@ -63,7 +63,7 @@ data BotReq = BotReq
     receivedName :: String,
     groupName :: String,
     groupRemark :: String,
-    roomType :: Int,
+    roomType :: String,
     atMe :: Bool
   }
   deriving (Generic, Show)
