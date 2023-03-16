@@ -2,8 +2,9 @@
 
 module Main where
 
-import Http.BotServer
+-- import Http.BotServer
+import Http.Server
 
 main :: IO ()
 main = do
-  startServer
+  http

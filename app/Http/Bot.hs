@@ -14,7 +14,7 @@ callBack name msg = do
         code = 0,
         respData =
           Message
-            { messageType = 500,
+            { messageType = 5000,
               info =
                 Info
                   { text = "body"
