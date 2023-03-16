@@ -73,6 +73,7 @@ executable server
         Http.Server,
         Http.Types,
         Http.Bot,
+        Http.BotServer,
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -98,7 +99,10 @@ executable server
         servant,
         servant-swagger-ui,
         servant-swagger,
-        swagger2
+        swagger2,
+        http-api-data,
+        servant-multipart,
+        network
 
     -- Directories containing source files.
     hs-source-dirs:   app
