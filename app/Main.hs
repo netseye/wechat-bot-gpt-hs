@@ -11,7 +11,8 @@ import Http.Server
 
 main :: IO ()
 main = do
-  http  
+  http
+    -- 以下是测试代码 
   result <-
     chatCompletion
       Chat

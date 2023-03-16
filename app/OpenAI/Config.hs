@@ -3,7 +3,6 @@
 module OpenAI.Config where
 
 import Control.Lens ((&), (.~))
-import Control.Monad.Reader (ReaderT (runReaderT))
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -18,10 +17,10 @@ fromEnvVariables = do
   orgValue <- lookupEnv "OPENAI_ORGANIZATION"
   case apiKeyValue of
     Nothing -> error "Error: Missing environment variable 'OPENAI_API_KEY'! This variable is required and needs to be set before proceeding. "
-    Just apiKey ->
+    Just key ->
       pure $
         createEmptyConfiguration
-          { apiKey = T.pack apiKey,
+          { apiKey = T.pack key,
             organization = T.pack $ fromMaybe "" orgValue
           }
 

@@ -10,7 +10,7 @@ callBack name msg = do
   liftIO $ print name >> print msg
   pure Resp
     { message = "success",
-      code = 200,
+      code = 0,
       respData =
         Message
           { messageType = "bot",
