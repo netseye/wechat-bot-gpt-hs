@@ -44,4 +44,6 @@ callback multipartData = do
       }
 
 startServer :: IO ()
-startServer = run 7700 (serve api callback)
+startServer = do
+  putStrLn "服务启动端口: 7700"
+  run 7700 (serve api callback)
