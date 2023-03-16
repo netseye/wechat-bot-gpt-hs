@@ -24,7 +24,7 @@ http = do
 
 type API =
   Get '[JSON] (String, String)
-    :<|> "callback" :> Capture "name" String :> ReqBody '[JSON] Message :> Post '[JSON] (Resp Message)
+    :<|> "callback" :> Capture "name" String :> ReqBody '[JSON] BotReq :> Post '[JSON] (Resp Message)
 
 type APIWithSwagger =
   SwaggerSchemaUI "swagger-ui" "swagger.json"

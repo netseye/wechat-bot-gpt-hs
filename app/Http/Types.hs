@@ -42,3 +42,21 @@ instance FromJSON Info
 instance ToJSON Info
 
 instance ToSchema Info
+
+
+data BotReq  = BotReq {
+  spoken :: String,
+  rawSpoken :: String,
+  receivedName :: String,
+  groupName :: String,
+  groupRemark :: String,
+  roomType :: Int,
+  atMe :: Bool
+} deriving (Generic, Show)
+
+
+instance FromJSON BotReq
+
+instance ToJSON BotReq
+
+instance ToSchema BotReq
