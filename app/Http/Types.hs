@@ -17,7 +17,7 @@ data Resp a = Resp
   deriving (Generic, Show)
 
 data Message = Message
-  { messageType :: String,
+  { messageType :: Int,
     info :: Info
   }
   deriving (Generic, Show)
@@ -42,7 +42,12 @@ instance ToSchema a => ToSchema (Resp a)
 
 instance FromJSON Message
 
-instance ToJSON Message
+instance ToJSON Message where
+  toJSON (Message m i) =
+    object
+      [ "type" .= m,
+        "info" .= i
+      ]
 
 instance ToSchema Message
 

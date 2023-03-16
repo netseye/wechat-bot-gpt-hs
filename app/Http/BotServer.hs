@@ -35,7 +35,7 @@ callback multipartData = do
         code = 0,
         respData =
           Message
-            { messageType = "bot",
+            { messageType = 500,
               info =
                 Info
                   { text = "body"
@@ -44,4 +44,4 @@ callback multipartData = do
       }
 
 startServer :: IO ()
-startServer = run 8080 (serve api callback)
+startServer = run 7700 (serve api callback)
