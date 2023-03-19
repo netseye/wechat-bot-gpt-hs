@@ -1,21 +1,35 @@
-
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE ExistentialQuantification #-}
 
 module Http.Server where
 
 import Control.Monad.IO.Class (liftIO)
-import Http.Bot
-import Http.Types
+import Http.Bot (callBack)
+import Http.Types (BotReq, Message, Resp)
 -- ------------------------------------------------
 
-import Network.Wai.Handler.Warp
+import Network.Wai.Handler.Warp (run)
 import Servant
-import Servant.Swagger
+  ( Capture,
+    Get,
+    Handler,
+    JSON,
+    Post,
+    Proxy (..),
+    ReqBody,
+    Server,
+    serve,
+    type (:<|>) (..),
+    type (:>),
+  )
+import Servant.Swagger (HasSwagger (toSwagger))
 import Servant.Swagger.UI
+  ( SwaggerSchemaUI,
+    swaggerSchemaUIServer,
+  )
 
 http :: IO ()
 http = do
@@ -36,7 +50,7 @@ status = do
   pure ("200", "success")
 
 serverAPI :: Server API
-serverAPI = status :<|> callBack 
+serverAPI = status :<|> callBack
 
 serverAPIWithSwagger :: Server APIWithSwagger
 serverAPIWithSwagger = swaggerSchemaUIServer (toSwagger (Proxy :: Proxy API)) :<|> serverAPI

@@ -1,8 +1,11 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use newtype instead of data" #-}
 
 module Types.Resp where
 
-import Data.Aeson
+import Data.Aeson (FromJSON, ToJSON)
 import GHC.Generics (Generic)
 
 data ChatCompletion = ChatCompletion
@@ -24,8 +27,6 @@ data Usage = Usage
 
 data Choice = Choice
   { message :: Message
-  -- finish_reason :: String,
-  -- index :: Int
   }
   deriving (Show, Generic)
 

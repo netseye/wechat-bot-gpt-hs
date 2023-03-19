@@ -2,8 +2,13 @@
 
 module Http.Bot where
 
-import Control.Monad.IO.Class
+import Control.Monad.IO.Class (MonadIO (..))
 import Http.Types
+  ( BotReq,
+    Info (Info, text),
+    Message (..),
+    Resp (..),
+  )
 
 callBack :: (MonadIO m) => String -> BotReq -> m (Resp Message)
 callBack name msg = do

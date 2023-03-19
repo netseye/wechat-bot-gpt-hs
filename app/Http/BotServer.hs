@@ -4,31 +4,51 @@
 
 module Http.BotServer where
 
-import Control.Monad
-import Control.Monad.IO.Class
+import Control.Monad.IO.Class (MonadIO (liftIO))
+import Data.Aeson (encode)
+import qualified Data.ByteString.Lazy as BSL
+import Database.Redis
+  ( connect,
+    defaultConnectInfo,
+    publish,
+    runRedis,
+  )
+import Http.Error
 import Http.Types
-import Network.Wai.Handler.Warp
+  ( BotReq,
+    Info (Info, text),
+    Message (..),
+    Resp (..),
+  )
+import Network.Wai.Handler.Warp (defaultSettings, runSettings, setLogger, setPort)
+import Network.Wai.Logger (withStdoutLogger)
 import Servant
-import Servant.Multipart
+  ( Capture,
+    Context (EmptyContext, (:.)),
+    JSON,
+    Post,
+    Proxy (..),
+    Server,
+    serveWithContext,
+    type (:>),
+  )
+import Servant.Multipart (Mem, MultipartForm)
 
-type API = MultipartForm Mem (MultipartData Mem) :> Post '[JSON] (Resp Message)
+type BotAPI = "callback" :> Capture "name" String :> MultipartForm Mem BotReq :> Post '[JSON] (Resp Message)
 
-api :: Proxy API
+api :: Proxy BotAPI
 api = Proxy
 
--- MultipartData consists in textual inputs,
--- accessible through its "inputs" field, as well
--- as files, accessible through its "files" field.
-callback :: Server API
-callback multipartData = do
+callback :: Server BotAPI
+callback name req = do
   liftIO $ do
-    putStrLn "Inputs:"
-    forM_ (inputs multipartData) $ \input ->
-      putStrLn $
-        "  "
-          ++ show (iName input)
-          ++ " -> "
-          ++ show (iValue input)
+    putStrLn name
+    print req
+    conn <- connect defaultConnectInfo
+    x <- runRedis conn $ publish "msg" (BSL.toStrict $ encode req)
+    case x of
+      Left err -> print err
+      Right _ -> putStrLn "task send success"
   return
     Resp
       { message = "success",
@@ -38,12 +58,16 @@ callback multipartData = do
             { messageType = 5000,
               info =
                 Info
-                  { text = "body"
+                  { text = ""
                   }
             }
       }
 
 startServer :: IO ()
 startServer = do
-  putStrLn "服务启动端口: 7700"
-  run 7700 (serve api callback)
+  withStdoutLogger $ \aplogger -> do
+    let settings = setPort 7700 $ setLogger aplogger defaultSettings
+    runSettings
+      settings
+      ( serveWithContext api (customFormatters :. EmptyContext) callback
+      )

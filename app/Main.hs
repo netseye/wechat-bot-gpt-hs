@@ -1,10 +1,7 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
 module Main where
 
--- import Http.BotServer
-import Http.Server
+import Http.BotServer
 
 main :: IO ()
 main = do
-  http
+  startServer

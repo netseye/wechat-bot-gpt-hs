@@ -3,16 +3,16 @@
 module OpenAI.Client where
 
 import Control.Lens ((^?))
-import Data.Aeson
+import Data.Aeson (ToJSON (toJSON))
 import Data.Aeson.Lens (_JSON)
 import qualified Data.Text as T
-import Network.Wreq
-import OpenAI.Config
-import OpenAI.Const
+import Network.Wreq (postWith, responseBody)
+import OpenAI.Config (fromEnvVariables, getHeaders)
+import OpenAI.Const (baseURL)
 import qualified Types.Req as Req
 import Types.Resp (ChatCompletion (..))
 
-chatCompletion :: Req.Chat -> IO (Either String ChatCompletion)
+chatCompletion :: Req.Chat -> IO (Maybe ChatCompletion)
 chatCompletion chat = do
   config <- fromEnvVariables
   r <-
@@ -20,6 +20,4 @@ chatCompletion chat = do
       (getHeaders config)
       (T.unpack $ baseURL <> "chat/completions")
       (toJSON chat)
-  case r ^? responseBody . _JSON of
-    Just resp -> pure $ Right resp
-    Nothing -> pure $ Left "Failed to decode response body"
+  return $ r ^? responseBody . _JSON

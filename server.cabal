@@ -74,6 +74,7 @@ executable server
         Http.Types,
         Http.Bot,
         Http.BotServer,
+        Http.Error,
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -102,7 +103,75 @@ executable server
         swagger2,
         http-api-data,
         servant-multipart,
-        network
+        network,
+        http-client,
+        hedis,
+        wai-logger
+        -- persistent,
+        -- persistent-template,
+        -- persistent-sqlite
+
+    -- Directories containing source files.
+    hs-source-dirs:   app
+
+    -- Base language which the package is written in.
+    default-language: Haskell2010
+
+
+executable Tasks
+    -- Import common warning flags.
+    import:           warnings
+
+    -- .hs or .lhs file containing the Main module.
+    main-is:          Tasks/Main.hs
+
+    -- Modules included in this executable, other than Main.
+    other-modules:
+        OpenAI.Config,
+        OpenAI.Const,
+        OpenAI.Client,
+        Feishu.Types,
+        Feishu.Config,
+        Feishu.Const,
+        Feishu.Client,
+        Feishu.Auth,
+        Http.Types,
+        Types.Configuration, 
+        Types.Req,
+        Types.Resp,
+
+    -- LANGUAGE extensions used by modules in this package.
+    -- other-extensions:
+
+    -- Other library packages from which modules are imported.
+    build-depends:    
+        base ^>=4.16.4.0,
+        lens,
+        wreq,
+        aeson,
+        lens-aeson,
+        text,
+        containers,
+        bytestring,
+        time,
+        mtl,
+        string-conversions,
+        transformers,
+        servant-swagger-ui,
+        wai,
+        warp,
+        servant-server,
+        servant,
+        servant-swagger-ui,
+        servant-swagger,
+        swagger2,
+        http-api-data,
+        servant-multipart,
+        network,
+        http-client,
+        hedis,
+        auto-update,
+        co-log
 
     -- Directories containing source files.
     hs-source-dirs:   app
