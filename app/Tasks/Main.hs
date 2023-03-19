@@ -38,11 +38,7 @@ main :: IO ()
 main = do
   -- 连接到Redis服务器
   conn <- connect defaultConnectInfo
-  -- fromEnvVariables >>= tenantAccessToken >>= \x -> do
-  --   case x of
-  --     Nothing -> putStrLn "get token error"
-  --     Just y -> setAuthToken conn y
-  --   print x
+
   putStrLn "任务队列开始"
   -- 订阅两个频道
   runRedis conn $ pubSub (subscribe ["msg"]) handler
