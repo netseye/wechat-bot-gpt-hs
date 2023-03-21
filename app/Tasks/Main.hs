@@ -8,7 +8,7 @@ import Control.Exception (SomeException, catch)
 import Control.Monad (void)
 import Data.Aeson (decode)
 import qualified Data.ByteString.Lazy as BSL
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, fromMaybe)
 import Data.Text (Text, unpack)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
@@ -71,7 +71,8 @@ doTask req = do
         Nothing -> return mempty
         Just d -> do
           r <- chatCompletion (Req.defaultChat (spoken m))
+          appid <- getWorkToolId
           let content = Resp.content $ Resp.message $ head $ Resp.choices (fromJust r)
           void $ bitableUpdateRecord d $ T.pack content
-          sendMessage (unpack $ receivedName m) "worktool1" content
+          sendMessage (unpack $ receivedName m) (fromMaybe "" appid) content
           return mempty
