@@ -3,11 +3,8 @@
 
 module Http.Error where
 
-import Data.Aeson (KeyValue ((.=)), ToJSON (toJSON), encode, object)
-import Data.ByteString
-import qualified Data.ByteString.Lazy.Internal as BSLI
+import Data.Aeson (KeyValue ((.=)), object)
 import Data.String.Conversions (cs)
-import Http.Types
 import Network.Wai (Request (rawPathInfo))
 import Servant
   ( ErrorFormatter,

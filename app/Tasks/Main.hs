@@ -50,32 +50,24 @@ main = do
 
 handler :: Message -> IO PubSub
 handler msg = do
-  void $ async $ do
-    doTask
-      ( decode $
-          BSL.fromStrict $
-            msgMessage msg
-      )
-      `catch` \(e :: SomeException) -> do
-        print e
-        return mempty
-  return mempty
+  async (doTask task `catch` handleException) >> return mempty
+  where
+    task = decode (BSL.fromStrict (msgMessage msg))
+    handleException :: SomeException -> IO PubSub
+    handleException e = print e >> return mempty
 
 doTask :: Maybe BotReq -> IO PubSub
-doTask req = do
-  case req of
-    Nothing -> return mempty
-    Just m -> do
-      if atMe m == "false" || T.null (groupName m)
-        then return mempty
-        else do
-          rid <- bitableAddRecord (receivedName m) (spoken m)
-          case rid of
-            Nothing -> return mempty
-            Just d -> do
-              r <- chatCompletion (Req.defaultChat (spoken m))
-              appid <- getWorkToolId
-              let content = Resp.content $ Resp.message $ head $ Resp.choices (fromJust r)
-              void $ bitableUpdateRecord d $ T.pack content
-              sendMessage (T.unpack $ groupName m) (T.unpack $ receivedName m) (fromMaybe "" appid) content
-              return mempty
+doTask Nothing = return mempty
+doTask (Just req)
+  | atMe req == "false" || T.null (groupName req) = return mempty
+  | otherwise = do
+      rid <- bitableAddRecord (receivedName req) (spoken req)
+      case rid of
+        Nothing -> return mempty
+        Just d -> do
+          r <- chatCompletion (Req.defaultChat (spoken req))
+          appid <- getWorkToolId
+          let content = Resp.content $ Resp.message $ head $ Resp.choices (fromJust r)
+          void $ bitableUpdateRecord d $ T.pack content
+          sendMessage (T.unpack $ groupName req) (T.unpack $ receivedName req) (fromMaybe "" appid) content
+          return mempty
