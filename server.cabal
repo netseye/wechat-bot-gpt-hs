@@ -139,6 +139,7 @@ executable Tasks
         Types.Configuration, 
         Types.Req,
         Types.Resp,
+        Wechat.Message,
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -171,7 +172,8 @@ executable Tasks
         http-client,
         hedis,
         auto-update,
-        co-log
+        co-log,
+        async
 
     -- Directories containing source files.
     hs-source-dirs:   app

@@ -3,12 +3,13 @@
 
 module Main where
 
+import Control.Concurrent.Async
 import Control.Exception (SomeException, catch)
 import Control.Monad (void)
 import Data.Aeson (decode)
 import qualified Data.ByteString.Lazy as BSL
 import Data.Maybe (fromJust)
-import Data.Text (Text)
+import Data.Text (Text, unpack)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Database.Redis
@@ -29,6 +30,7 @@ import Http.Types (BotReq (..))
 import OpenAI.Client (chatCompletion)
 import qualified Types.Req as Req
 import qualified Types.Resp as Resp
+import Wechat.Message
 
 setAuthToken :: Connection -> (Text, Integer) -> IO ()
 setAuthToken conn y = do
@@ -48,14 +50,16 @@ main = do
 
 handler :: Message -> IO PubSub
 handler msg = do
-  doTask
-    ( decode $
-        BSL.fromStrict $
-          msgMessage msg
-    )
-    `catch` \(e :: SomeException) -> do
-      print e
-      return mempty
+  void $ async $ do
+    doTask
+      ( decode $
+          BSL.fromStrict $
+            msgMessage msg
+      )
+      `catch` \(e :: SomeException) -> do
+        print e
+        return mempty
+  return mempty
 
 doTask :: Maybe BotReq -> IO PubSub
 doTask req = do
@@ -68,5 +72,6 @@ doTask req = do
         Just d -> do
           r <- chatCompletion (Req.defaultChat (spoken m))
           let content = Resp.content $ Resp.message $ head $ Resp.choices (fromJust r)
-          _ <- bitableUpdateRecord d $ T.pack content
+          void $ bitableUpdateRecord d $ T.pack content
+          sendMessage (unpack $ receivedName m) "worktool1" content
           return mempty
