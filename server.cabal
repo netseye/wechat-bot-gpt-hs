@@ -140,6 +140,7 @@ executable wechat-tasks
         Types.Req,
         Types.Resp,
         Wechat.Message,
+        Utils.Logger,
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

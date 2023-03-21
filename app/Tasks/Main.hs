@@ -3,7 +3,7 @@
 
 module Main where
 
-import Control.Concurrent.Async
+import Control.Concurrent.Async (async)
 import Control.Exception (SomeException, catch)
 import Control.Monad (void)
 import Data.Aeson (decode)
@@ -29,7 +29,8 @@ import Http.Types (BotReq (..))
 import OpenAI.Client (chatCompletion)
 import qualified Types.Req as Req
 import qualified Types.Resp as Resp
-import Wechat.Message
+import Utils.Logger (LogLevel (..), logger)
+import Wechat.Message (getWorkToolId, sendMessage)
 
 setAuthToken :: Connection -> (Text, Integer) -> IO ()
 setAuthToken conn y = do
@@ -40,7 +41,7 @@ main = do
   -- 连接到Redis服务器
   conn <- connect defaultConnectInfo
 
-  putStrLn "任务队列开始"
+  logger Info "任务队列开始"
   -- 订阅两个频道
   runRedis conn $ pubSub (subscribe ["msg"]) handler
 
