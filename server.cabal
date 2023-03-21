@@ -11,7 +11,7 @@ cabal-version:      3.0
 --   http://haskell.org/cabal/users-guide/
 --
 -- The name of the package.
-name:               server
+name:               wechat-bot-hs
 
 -- The package version.
 -- See the Haskell package versioning policy (PVP) for standards
@@ -54,7 +54,7 @@ extra-doc-files:    CHANGELOG.md
 common warnings
     ghc-options: -Wall
 
-executable server
+executable wechat-server
     -- Import common warning flags.
     import:           warnings
 
@@ -118,7 +118,7 @@ executable server
     default-language: Haskell2010
 
 
-executable Tasks
+executable wechat-tasks
     -- Import common warning flags.
     import:           warnings
 
