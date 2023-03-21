@@ -9,9 +9,9 @@ import Control.Monad (void)
 import Data.Aeson (decode)
 import qualified Data.ByteString.Lazy as BSL
 import Data.Maybe (fromJust, fromMaybe)
-import Data.Text (Text, unpack)
+import Data.Text (Text)
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
+import qualified Data.Text.Encoding as TE
 import Database.Redis
   ( Connection,
     Message (msgMessage),
@@ -25,7 +25,6 @@ import Database.Redis
     subscribe,
   )
 import Feishu.Client (bitableAddRecord, bitableUpdateRecord)
--- import Feishu.Config (fromEnvVariables)
 import Http.Types (BotReq (..))
 import OpenAI.Client (chatCompletion)
 import qualified Types.Req as Req
@@ -34,7 +33,7 @@ import Wechat.Message
 
 setAuthToken :: Connection -> (Text, Integer) -> IO ()
 setAuthToken conn y = do
-  runRedis conn $ void $ setex "authtoken" (snd y) $ T.encodeUtf8 (fst y)
+  runRedis conn $ void $ setex "authtoken" (snd y) $ TE.encodeUtf8 (fst y)
 
 main :: IO ()
 main = do
@@ -66,13 +65,16 @@ doTask req = do
   case req of
     Nothing -> return mempty
     Just m -> do
-      rid <- bitableAddRecord (receivedName m) (spoken m)
-      case rid of
-        Nothing -> return mempty
-        Just d -> do
-          r <- chatCompletion (Req.defaultChat (spoken m))
-          appid <- getWorkToolId
-          let content = Resp.content $ Resp.message $ head $ Resp.choices (fromJust r)
-          void $ bitableUpdateRecord d $ T.pack content
-          sendMessage (unpack $ receivedName m) (fromMaybe "" appid) content
-          return mempty
+      if atMe m == "false" || T.null (groupName m)
+        then return mempty
+        else do
+          rid <- bitableAddRecord (receivedName m) (spoken m)
+          case rid of
+            Nothing -> return mempty
+            Just d -> do
+              r <- chatCompletion (Req.defaultChat (spoken m))
+              appid <- getWorkToolId
+              let content = Resp.content $ Resp.message $ head $ Resp.choices (fromJust r)
+              void $ bitableUpdateRecord d $ T.pack content
+              sendMessage (T.unpack $ groupName m) (T.unpack $ receivedName m) (fromMaybe "" appid) content
+              return mempty

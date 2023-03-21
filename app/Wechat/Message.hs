@@ -10,8 +10,8 @@ import System.Environment (lookupEnv)
 getWorkToolId :: IO (Maybe String)
 getWorkToolId = lookupEnv "WECHAT_WORKTOOL_APP_ID"
 
-sendMessage :: String -> String -> String -> IO ()
-sendMessage name robotId msg = do
+sendMessage :: String -> String -> String -> String -> IO ()
+sendMessage groupName name robotId msg = do
   let url = "https://worktool.asrtts.cn/wework/sendRawMessage?robotId=" ++ robotId
   putStrLn $ "url: " ++ url
   let opts =
@@ -23,8 +23,9 @@ sendMessage name robotId msg = do
             "list"
               .= [ object
                      [ "type" .= (203 :: Int),
-                       "titleList" .= [name],
-                       "receivedContent" .= msg
+                       "titleList" .= [groupName],
+                       "receivedContent" .= msg,
+                       "atList" .= [name]
                      ]
                  ]
           ]
